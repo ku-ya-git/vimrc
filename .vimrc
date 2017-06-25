@@ -1,163 +1,47 @@
+set encoding=utf-8
+scriptencoding utf-8
+" マルチバイト使用前に宣言
+
+"-------------------------------------------------------------------------------
+"文字コードの優先順位
+"-------------------------------------------------------------------------------
+set fileencodings=ucs-bom,utf-8,cp932,euc-jp
+
 "-------------------------------------------------------------------------------
 "設定のためにファイルタイプ判定をOFF
 "-------------------------------------------------------------------------------
 filetype off
 filetype plugin indent off
+
 "-------------------------------------------------------------------------------
-"VIM標準設定
+"共通変数
 "-------------------------------------------------------------------------------
-set cryptmethod=blowfish "暗号化
-set undodir=$HOME/.vim/undo "アンドゥファイルフォルダ
-set undofile "全てのファイルが閉じてもundo管理対象
-set directory=$VIM/vimfiles/swp "スワップファイルフォルダ
-set noswapfile "スワップファイルを生成しない
-set nobackup "バックアップファイルを生成しない
-"set clipboard+=unnamed "クリップボードとレジスタを連携
-set clipboard=unnamed,unnamedplus
-set number "ライン番号を表示
-set showtabline=2 " タブを常に表示
-set antialias " アンチエイリアス
-set tabstop=4 " タブサイズ
-set shiftwidth=4 " インデント幅
-set visualbell t_vb= " ビープ音なし
-set autoindent " 自動インデント
-set expandtab " タブスペース化
-set novisualbell " 画面点滅を消す
-set cursorline " カーソル位置を横線で表示
-"set cursorcolumn " カーソル位置を縦線で表示
-set ambiwidth=double " 全角記号を扱う
-set nowrap " 画面幅で折り返さない
-set ignorecase " 検索時に大文字小文字を区別しない
-set ignorecase " 大文字小文字無視検索
-set showmatch " 対応する括弧を強調表示
-set guioptions-=m " メニューバー非表示
-set guioptions-=T " ツールバーを非表示
-set updatetime=1000 " VIMの自動更新時間
-set virtualedit=all " フリーカーソル
-" 文字コードの優先順位
-set fileencodings=ucs-bom,utf-8,utf-16le,utf-16,iso-2022-jp,cp932,sjis,euc-jp
-" 80文字で縦線表示
-set textwidth=80
-    if exists('&colorcolumn')
-    set colorcolumn=+2
+if has('unix')
+    let s:vimhome = '~/.vim'
+    let s:userhome = '/home/unser_name'
+endif
+if has('win')
+    let s:vimhome = $VIM
+    let s:userhome = 'C:\Users\user_name'
 endif
 
-" コマンドが存在すれば
-if isdirectory($HOME."/.vim/user_plugins/kwbd")
-    cabbrev q Kwbd
-    cabbrev Kwbd! q!
-endif
-
-" Insertモードのときカーソルの形状を変更
-let &t_SI = "\<Esc>]50;CursorShape=1\x7"
-let &t_EI = "\<Esc>]50;CursorShape=0\x7"
-inoremap <Esc> <Esc>
-
-" カラー設定
-colorscheme railscasts
-
-" カレントフォルダを変更
-lcd $HOME/デスクトップ
-
-
-" タブの表示
-set list
-set listchars=tab:>-,trail:-,extends:<,precedes:<
-
-" 新しい行のインデントを現在行と同じにする
-set autoindent
-
-" 新しい行を作ったときに高度な自動インデントを行う
-set smartindent
-set showmatch "対応する括弧を表示
-"自動改行を回避※英数字
-set textwidth=0
-"自動改行を回避※日本語
-set formatoptions=q
-
-"IDE風にファイラーを開く
-command IdeVimFiler VimFiler -split -simple -winwidth=25 -no-quit
-
-"右タブに移動
-noremap <C-Tab> <ESC>:tabn<CR>
-"左タブに移動
-noremap <C-S-Tab> <ESC>:tabp<CR>
-
-"Ctrl+zでアンドゥ
-inoremap <C-z> <ESC>:u<CR>a
-nnoremap <C-z> <ESC>:u<CR>
-
-"Ctrl+sで保存とアンドゥを確定
-if has('gui')
-    inoremap <C-s> <C-G>u<ESC>:w<CR>a
-    nnoremap <C-s> <ESC>:w<CR>
-endif
-
-"アウトライン
-nnoremap <S-o> :Unite outline<CR>
-
-"すべて選択
-nnoremap <C-a> <ESC>ggVG
-
-"検索ハイライト消去
-nnoremap <ESC><ESC> :noh<CR>
-
-"tagsがカレントに無い場合、親ディレクトリを見に行く
-set tags=tags;
-nnoremap <C-]> g<C-]>
-
-"tagファイルを基にしたハイライト
-map <F11>  :sp tags<CR>:%s/^\([^     :]*:\)\=\([^    ]*\).*/syntax keyword Tag \2/<CR>:wq! tags.vim<CR>/^<CR><F12>
-map <F12>  :so tags.vim<CR>
-
-"文字のイタリック表示を無効化
-hi markdownItalic gui=none
-
-"インデントの自動制御を変更
-set foldmethod=manual
-set foldlevel=12
-autocmd FileType java :set foldmethod=indent
-autocmd FileType sql :set foldmethod=indent
-autocmd FileType html :set foldmethod=indent
-autocmd FileType jsp :set foldmethod=indent
-
-"-------------------------------------------------------------------------------
-"ステーターバーに文字コードと改行コードを表示
-"-------------------------------------------------------------------------------
-set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
-
-"-------------------------------------------------------------------------------
-"水平スクロールバー
-"-------------------------------------------------------------------------------
-if has('gui')
-    set guioptions+=b
-endif
-"-------------------------------------------------------------------------------
-" カレントディレクトリの設定
-"-------------------------------------------------------------------------------
-" ファイルのディレクトリを自動的にカレントディレクトリに変更します
-au BufEnter * execute ":lcd " . expand("%:p:h")
 
 "-------------------------------------------------------------------------------
 " ユーザープラグインの設定
-"-----------------------------------------------------------------------------
-"UNIX用
-"let s:path = system("echo echo VIMPATH'${PATH}' | $SHELL -l")
-"let $PATH = matchstr(s:path, 'VIMPATH\zs.\{-}\ze\n')
-"ここまではUNIX用
-for s:path in split(glob('~/.vim/user_plugins/*'), '\n')
-  if s:path !~# '\~$' && isdirectory(s:path)
-    let &runtimepath = &runtimepath.','.s:path
-  end
-endfor
+"-------------------------------------------------------------------------------
+    for s:path in split(glob(s:vimhome.'/user_plugins/*'), '\n')
+      if s:path !~# '\~$' && isdirectory(s:path)
+        let &runtimepath = &runtimepath.','.s:path
+      end
+    endfor
 unlet s:path
 
 "-------------------------------------------------------------------------------
 "NeoBundle
 "-------------------------------------------------------------------------------
 " プラグインが実際にインストールされるディレクトリ
-let s:dein_dir = expand('~/.vim/dein')
-
+let s:dein_dir = expand(s:vimhome.'/dein')
+let g:dein#install_process_timeout=420
 " 設定開始
 if dein#load_state(s:dein_dir)
     call dein#begin(s:dein_dir)
@@ -178,8 +62,6 @@ if dein#load_state(s:dein_dir)
     call dein#add('glidenote/memolist.vim')
     "https://github.com/wesleyche/SrcExpl ※tags先を表示
     call dein#add('wesleyche/SrcExpl')
-    "https://github.com/vim-scripts/Trinity ※IDE化
-    "call dein#add('vim-scripts/Trinity')
     "https://github.com/sgur/unite-everything ※ファイル検索
     "call dein#add('sgur/unite-everything')
     "https://github.com/thinca/vim-singleton ※VIMのシングル起動
@@ -226,37 +108,22 @@ if dein#load_state(s:dein_dir)
     "    作業するファイルの拡張子 例) “*.html *.css *.js *.as”
     call dein#add('vimplugin/project.vim')
     "https://github.com/bling/vim-airline ※ステータスラインのカラーを変更
-    "call dein#add('bling/vim-airline'
+    call dein#add('bling/vim-airline')
+    call dein#add('vim-airline/vim-airline-themes')
     "https://github.com/itchyny/lightline.vim ※ステータスラインのカラーを変更
     call dein#add('itchyny/lightline.vim')
     "https://github.com/LeafCage/yankround.vim ※レジスタの履歴を取得・再利用する
     call dein#add('LeafCage/yankround.vim')
-    "https://github.com/koron/minimap-vim ※ミニマップ
-    "call dein#add('koron/minimap-vim')
     "https://github.com/rust-lang/rust.vim ※rust言語の強調表示
     call dein#add('rust-lang/rust.vim')
-    "https://github.com/phildawes/racer ※rust言語の補完
-    "call dein#add('phildawes/racer')
+    "https://github.com/racer-rust/vim-racer ※rust言語の補完
+    call dein#add('racer-rust/vim-racer')
     "https://github.com/thinca/vim-fontzoom ※フォントサイズを変更
     call dein#add('thinca/vim-fontzoom')
     "http://nanasi.jp/articles/vim/zoom_vim.htmlの方がWinGVimでは良い
     "カラースキーム
-    "https://github.com/w0ng/vim-hybrid
-    "call dein#add('w0ng/vim-hybrid')
-    "https://github.com/29decibel/codeschool-vim-theme ※イタリック
-    "call dein#add('29decibel/codeschool-vim-theme')
-    "https://github.com/fugalh/desert.vim
-    "call dein#add('fugalh/desert.vim')
     "https://github.com/jpo/vim-railscasts-theme
     call dein#add('jpo/vim-railscasts-theme')
-    "https://github.com/vim-scripts/Align ※テキスト整形 GitHubのひとつ古いVer日本語にバグあり
-    "本家http://www.vim.org/scripts/script.php?script_id=294
-    "下記のコマンドで解凍できる
-    ":e $VIM/user_plugins/Align.vba
-    ":UseVimball $VIM/user_plugins/align
-    "call dein#add('vim-scripts/Align'
-    "SVNの場合
-    "NeoBundle 'thinca/vim-localrc', {'type' : 'svn'}
     "https://github.com/vim-scripts/javacomplete ※ JAVA補完
     call dein#add('vim-scripts/javacomplete')
     "https://github.com/udalov/kotlin-vim ※Kotlinのシンタックス
@@ -271,12 +138,20 @@ if dein#load_state(s:dein_dir)
     call dein#add('hynek/vim-python-pep8-indent')
     "https://github.com/kevinw/pyflakes-vim ※Pythonの構文チェック
     "call dein#add('kevinw/pyflakes-vim')
-
     call dein#add('mattn/emmet-vim')
-    call dein#add('open-browser.vim')
     call dein#add('hail2u/vim-css3-syntax')
     "https://github.com/pangloss/vim-javascript
     call dein#add('pangloss/vim-javascript')
+    "https://github.com/fatih/vim-go
+    call dein#add('fatih/vim-go')
+    "https://github.com/kana/vim-operator-user ※キャメル、スネーク変換の依存プラグイン
+    call dein#add('kana/vim-operator-user')
+    "https://github.com/tyru/operator-camelize.vim ※キャメル、スネーク変換
+    call dein#add('tyru/operator-camelize.vim')
+    "https://github.com/vim-scripts/opsplorer ※縦置き用のエクスプローラー
+    call dein#add('vim-scripts/opsplorer')
+    "https://github.com/PProvost/vim-ps1 ※Power Shell
+    call dein#add('PProvost/vim-ps1')
 
     " 設定終了
     call dein#end()
@@ -287,6 +162,175 @@ if dein#check_install()
     call dein#install()
 endif
 
+"-------------------------------------------------------------------------------
+" シンタックスはruntimepath(プラグインの読み込み)の設定後にONにする
+"-----------------------------------------------------------------------------
+syntax on
+
+"-------------------------------------------------------------------------------
+"VIM標準設定
+"-------------------------------------------------------------------------------
+set cryptmethod=blowfish "暗号化
+set undodir=s:vimhome/undo "アンドゥファイルフォルダ
+set undofile "全てのファイルが閉じてもundo管理対象
+set directory=s:vimhome/vimfiles/swp "スワップファイルフォルダ
+set noswapfile "スワップファイルを生成しない
+set nobackup "バックアップファイルを生成しない
+set clipboard+=unnamed "クリップボードとレジスタを連携
+if has('unix')
+    set clipboard=unnamedplus
+endif
+set number "ライン番号を表示
+set showtabline=2 " タブを常に表示
+set antialias " アンチエイリアス
+set tabstop=4 " タブサイズ
+set shiftwidth=4 " インデント幅
+set visualbell t_vb= " ビープ音なし
+set autoindent " 自動インデント
+set expandtab " タブスペース化
+set novisualbell " 画面点滅を消す
+set cursorline " カーソル位置を横線で表示
+"set cursorcolumn " カーソル位置を縦線で表示
+set ambiwidth=double " 全角記号を扱う
+set nowrap " 画面幅で折り返さない
+set ignorecase " 検索時に大文字小文字を区別しない
+set ignorecase " 大文字小文字無視検索
+set showmatch " 対応する括弧を強調表示
+set guioptions-=m " メニューバー非表示
+set guioptions-=T " ツールバーを非表示
+set updatetime=1000 " VIMの自動更新時間
+set virtualedit=all " フリーカーソル
+set hidden " 保存されていないファイルがあるときでも別のファイルを開くことが出来る
+" 新しい行を作ったときに高度な自動インデントを行う
+set smartindent
+"自動改行を回避※英数字
+set textwidth=0
+"自動改行を回避※日本語
+set formatoptions=q
+"挿入モード(insert mode)のときにInput Method(IM)を使うか
+"0 IM はオフ
+"1 IM はオフ
+"2 IM はオン
+set iminsert=0
+"-1 iminsertの値を使います
+"0 IM はオフ
+"1 IM はオフ
+"2 IM はオン
+set imsearch=0
+
+" 100文字で縦線表示
+set textwidth=100
+    if exists('&colorcolumn')
+    set colorcolumn=+2
+endif
+
+let loaded_matchparen=1 " 括弧強調を中止
+
+" 削除キーでyankしない
+nnoremap x "_x
+nnoremap d "_d
+nnoremap D "_D
+"バックスペースで削除を可能にする
+set backspace=indent,eol,start
+
+map <silent> <F11>
+\    :call system("wmctrl -ir " . v:windowid . " -b toggle,fullscreen")<CR>
+
+" Insertモードのときカーソルの形状を変更
+let &t_SI = "\<Esc>]50;CursorShape=1\x7"
+let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+inoremap <Esc> <Esc>
+
+" カラー設定
+if has('gui')
+    colorscheme railscasts
+endif
+
+if !has('gui')
+    colorscheme darkblue
+endif
+
+" カレントフォルダを変更
+if has('unix')
+    lcd $HOME/デスクトップ
+endif
+
+" タブの表示
+set list
+set listchars=tab:>-,trail:-,extends:<,precedes:<
+
+"右タブに移動
+noremap <C-Tab> <ESC>:tabn<CR>
+"左タブに移動
+noremap <C-S-Tab> <ESC>:tabp<CR>
+
+"Ctrl+zでアンドゥ
+inoremap <C-z> <ESC>:u<CR>a
+nnoremap <C-z> <ESC>:u<CR>
+
+"Ctrl+sで保存とアンドゥを確定
+if has('gui')
+    inoremap <C-s> <C-G>u<ESC>:w<CR>a
+    nnoremap <C-s> <ESC>:w<CR>
+endif
+
+"アウトライン
+nnoremap <C-S-o> :Unite outline<CR>
+
+"すべて選択
+nnoremap <C-a> <ESC>ggVG
+
+"検索ハイライト消去
+nnoremap <ESC><ESC> :noh<CR>
+
+"tagsがカレントに無い場合、親ディレクトリを見に行く
+set tags=tags;
+nnoremap <C-]> g<C-]>
+
+"tagファイルを基にしたハイライト
+" map <F11>  :sp tags<CR>:%s/^\([^     :]*:\)\=\([^    ]*\).*/syntax keyword Tag \2/<CR>:wq! tags.vim<CR>/^<CR><F12>
+" map <F12>  :so tags.vim<CR>
+
+"文字のイタリック表示を無効化
+hi markdownItalic gui=none
+
+"インデントの自動制御を変更
+set foldmethod=manual
+
+"-------------------------------------------------------------------------------
+"ステーターバーに文字コードと改行コードを表示
+"-------------------------------------------------------------------------------
+set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
+
+"-------------------------------------------------------------------------------
+"水平スクロールバー
+"-------------------------------------------------------------------------------
+if has('gui')
+    set guioptions+=b
+endif
+"-------------------------------------------------------------------------------
+" カレントディレクトリの設定
+"-------------------------------------------------------------------------------
+" ファイルのディレクトリを自動的にカレントディレクトリに変更します
+au BufEnter * execute ":lcd " . expand("%:p:h")
+
+
+"-------------------------------------------------------------------------------
+"vim-ps1
+"-------------------------------------------------------------------------------
+let g:ps1_nofold_blocks = 1
+let g:ps1_nofold_sig = 1
+"-------------------------------------------------------------------------------
+"vim-go
+"-------------------------------------------------------------------------------
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_types = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+let g:go_fmt_command = "goimports"
+let g:go_bin_path = s:userhome . '/golib'
 "-------------------------------------------------------------------------------
 "yankround.vim
 "-------------------------------------------------------------------------------
@@ -317,15 +361,7 @@ let g:lightline = {
 "gundo.vim
 "-------------------------------------------------------------------------------
 nnoremap U :<C-u>GundoToggle<CR>
-"-------------------------------------------------------------------------------
-"Align ※SMコマンドが利かなくなる
-"-------------------------------------------------------------------------------
-" Alignを日本語環境で使用するための設定
-"let g:Align_xstrlen = 3
-" コマンドのフォーマット
-" :Align {区切り文字}
-" \tsp ※空白を整形
-" \tab ※タブを整形
+
 "-------------------------------------------------------------------------------
 "vim-indent-guides
 "-------------------------------------------------------------------------------
@@ -338,6 +374,16 @@ if has('gui')
     autocmd VimEnter,Colorscheme * :hi IndentGuidesEven  guibg=#444433 ctermbg=darkgray
     " ガイドサイズ
     let g:indent_guides_guide_size=1
+endif
+"-------------------------------------------------------------------------------
+"文末のスペースを強調
+"-------------------------------------------------------------------------------
+if has('gui')
+    augroup HighlightTrailingSpaces
+        autocmd!
+        autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=Red ctermbg=Red
+        autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
+    augroup END
 endif
 "-------------------------------------------------------------------------------
 "ctrlp.vim
@@ -374,14 +420,6 @@ if has('win32') || has ('win64')
     call unite#custom_action('openable', 'start', start)
     unlet start
 endif
-
-"-------------------------------------------------------------------------------
-"dbext.vim
-"-------------------------------------------------------------------------------
-"let g:dbext_default_profile_ORA_Extended_TEST = 'type=ORA:user=USERNAME:passwd=PASSWORD:srvname=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1000)))(CONNECT_DATA=(SERVICE_NAME=識別名)))'
-"let dbext_default_profile='dbext_map_profile_ORA_Extended_TEST'
-"vimに表示する行数
-"let dbext_default_buffer_lines=1000
 
 "-------------------------------------------------------------------------------
 "matchit.vim 括弧などの対となる文字に%キーでジャンプ
@@ -450,8 +488,8 @@ endif
 "-------------------------------------------------------------------------------
 let g:syntastic_mode_map = {
             \ 'mode': 'active',
-            \ 'active_filetypes': ['php', 'sh', 'vim'],
-            \ 'passive_filetypes': ['html', 'python']
+            \ 'active_filetypes': ['php', 'sh', 'vim', 'py'],
+            \ 'passive_filetypes': ['html']
             \}
 
 "-------------------------------------------------------------------------------
@@ -489,7 +527,6 @@ function! s:my_cr_function()
 endfunction
 
 
-
 " 自動補完
 let g:acp_enableAtStartup = 0
 " プラグイン自動有効化
@@ -510,7 +547,7 @@ autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 autocmd FileType *.php setlocal omnifunc=phpcomplete#CompletePHP
 autocmd FileType *.cpp,*.h,*.hpp setlocal omnifunc=cppcomplete#CompleteCPP
-
+let g:neocomplete#sources#omni#input_patterns.go = '\h\w\.\w*'
 autocmd FileType java :setlocal omnifunc=javacomplete#Complete
 autocmd FileType java :setlocal completefunc=javacomplete#CompleteParamsInfo
 autocmd FileType kotlin :setlocal omnifunc=javacomplete#Complete
@@ -523,23 +560,26 @@ let g:jedi#completions_enabled = 0
 let g:jedi#auto_vim_configuration = 0
 let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
 
-
-
-"Eclimをインストールしている場合
-"let g:EclimCompletionMethod = 'omnifunc'
-"if !exists('g:neocomplete#force_omni_input_patterns')
-"   let g:neocomplete#force_omni_input_patterns = {}
-"endif
-"let g:neocomplete#sources#omni#input_patterns.java = '\k\.\k*'
-
-
-
 "-------------------------------------------------------------------------------
 "SingletonVIM
 "-------------------------------------------------------------------------------
 call singleton#enable()
 
+"-------------------------------------------------------------------------------
+"辞書
+"-------------------------------------------------------------------------------
+set dictionary=s:vimhome.'/dic.txt'
 
+"-------------------------------------------------------------------------------
+"neocomplete
+"-------------------------------------------------------------------------------
+let s:neco_dicts_dir = s:vimhome . '/dicts'
+if isdirectory(s:neco_dicts_dir)
+  let g:neocomplete#sources#dictionary#dictionaries = {
+  \   'go': s:neco_dicts_dir . '/go.dict'
+  \ }
+endif
+let g:neocomplete#auto_completion_start_length = 1
 
 "-------------------------------------------------------------------------------
 "VimFiler
@@ -547,6 +587,16 @@ call singleton#enable()
 "セーフモードをOFF コピー等ができるようになる
 let g:vimfiler_safe_mode_by_default = 0
 let g:vimfiler_enable_auto_cd = 1
+
+"-------------------------------------------------------------------------------
+"airline
+"-------------------------------------------------------------------------------
+let g:airline_theme = 'molokai'
+
+"-------------------------------------------------------------------------------
+"キャメルケースとスネークケースのトグル変換
+"-------------------------------------------------------------------------------
+map <leader>c <plug>(operator-vamelize-toggle)
 
 "-------------------------------------------------------------------------------
 "ファイル判定の有効化
@@ -560,51 +610,4 @@ filetype plugin indent on
 "https://sites.google.com/site/fudist/Home/qfixhowm ※カレンダー・スケジュール・メモ
 "http://nanasi.jp/articles/vim/kwbd_vim.html ※レイアウトを崩さずにバッファを閉じる
 "http://www.vim.org/scripts/script.php?script_id=273 ※tagのリストを表示GitHubは古いバージョンしか置いていない
-
-"-------------------------------------------------------------------------------
-"ショートカットメモ
-"-------------------------------------------------------------------------------
-"<C-w>s 横分割
-"<C-w>v 縦分割
-"<C-w>q ウインドウを閉じる
-"<C-w>hjkl or <C-w>w ウインドウ移動
-
-
-"-------------------------------------------------------------------------------
-"VimFilerショートカット
-"-------------------------------------------------------------------------------
-"┏━━━┳━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-"┃キー  ┃対象      ┃機能                                                  ┃
-"┣━━━╋━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃e     ┃カーソル下┃ファイル → vim で開く                                ┃
-"┃      ┃          ┃ディレクトリ → vimfiler で開く                       ┃
-"┣━━━╋━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃x     ┃カーソル下┃システムの関連付けを実行                              ┃
-"┣━━━╋━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃Enter ┃カーソル下┃vimfiler の関連付けを実行                             ┃
-"┃      ┃          ┃（ディレクトリの場合は移動）                          ┃
-"┣━━━╋━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃l     ┃カーソル下┃vimfiler の関連づけを実行                             ┃
-"┣━━━╋━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃E     ┃--        ┃外部ファイラでディレクトリを開く(Mac なら Finder など)┃
-"┗━━━┻━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-"┏━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-"┃r ┃カーソル下／選択┃ファイルの名前を変更                                      ┃
-"┣━╋━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃m ┃--／選択        ┃ファイルを移動                                            ┃
-"┣━╋━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃c ┃--／選択        ┃ファイルをコピー                                          ┃
-"┣━╋━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃p ┃--              ┃ファイルをペースト                                        ┃
-"┣━╋━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃d ┃--／選択        ┃ファイルを削除（ゴミ箱への移動）                          ┃
-"┣━╋━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃D ┃--／選択        ┃ファイルを削除（rm 相当）                                 ┃
-"┣━╋━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃u ┃--／選択        ┃ファイルをゴミ箱から復元（d によって削除したもののみ有効）┃
-"┣━╋━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃K ┃--              ┃新規ディレクトリを作成                                    ┃
-"┣━╋━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-"┃N ┃--              ┃新規ファイルを作成                                        ┃
-"┗━┻━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
